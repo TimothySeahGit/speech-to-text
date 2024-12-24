@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import uvicorn
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile
 
 import logging
 import sys
@@ -20,8 +20,6 @@ from transformers import pipeline
 
 pipe = pipeline("automatic-speech-recognition", model="./models")
 
-# import ffmpeg
-# duration = ffmpeg.probe(local_file_path)["format"]["duration"]
 temp_filepath = 'input.mp3'
 
 
@@ -40,9 +38,9 @@ def ping():
 @app.post("/asr/")
 def create_file(file: Annotated[bytes, File()]):
     logger.debug(f'File size: {len(file)}')
-    # TODO: enforce a file size limit
-    # TODO: resample audio to 16000hz
- 
+    if len(file) > 10000000: # 10 Mb
+        raise HTTPException(status_code=404, detail="File Size too big, limit is 10Mb")
+
     process = (
         ffmpeg
         .input('pipe:0')
@@ -55,6 +53,17 @@ def create_file(file: Annotated[bytes, File()]):
     process.wait()
 
     duration = ffmpeg.probe(temp_filepath)["format"]["duration"]
+
+    try: 
+        os.remove(temp_filepath) 
+        logger.debug(f"{temp_filepath} removed successfully") 
+    except OSError as error: 
+        logger.debug(error) 
+        logger.debug("File path can not be removed") 
+
+    
+    # TODO: resample audio to 16000hz
+ 
 
     return {"transcription": pipe(file), "duration": "{:.2f}".format(float(duration))}
 
