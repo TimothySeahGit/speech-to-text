@@ -5,6 +5,8 @@ from fastapi import FastAPI, File, UploadFile
 
 import logging
 import sys
+import os
+
 
 logger = logging.getLogger('uvicorn.error')
 logger.setLevel(logging.DEBUG)
@@ -12,6 +14,14 @@ logger.setLevel(logging.DEBUG)
 app = FastAPI()
 
 PORT: int  = 8001
+
+# # Use a pipeline as a high-level helper
+from transformers import pipeline
+
+pipe = pipeline("automatic-speech-recognition", model="./models")
+
+# import ffmpeg
+# duration = ffmpeg.probe(local_file_path)["format"]["duration"]
 
 
 @app.on_event("startup")
@@ -29,7 +39,10 @@ def ping():
 @app.post("/asr/")
 async def create_file(file: Annotated[bytes, File()]):
     logger.debug(f'File size: {len(file)}')
-    return {"file_size": len(file)}
+    # TODO: enforce a file size limit
+    # TODO: resample audio to 16000hz
+
+    return {"file_size": len(file), "transcribed": pipe(file)}
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile):
