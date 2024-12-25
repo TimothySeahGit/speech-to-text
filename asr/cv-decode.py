@@ -51,32 +51,22 @@ def get_transcription(source_path, filename):
     
     Returns:
         generated_text (str): The transcribed text.
+        duration (str): The duration of the mp3 file, in seconds.
     """
     if os.path.exists(source_path + filename):
-        response = __call_api(source_path + filename)
-        print(filename)
-        return response.json()['transcription'].lower()
+        print('processing ', filename)
+        response_json = __call_api(source_path + filename).json()
+        return response_json['transcription'].lower(), response_json['duration']
     else:
         err = 'ERROR! File not found in source directory'
         print(err)
-        return err
+        return err, 'err'
 
-
-
-
-all_files = os.listdir(source_path)
-print(all_files[:5])
 
 dataframe = pd.read_csv('cv-valid-dev.csv')
 
-# for filename in dataframe['filename']:
-#     mp3_filename = filename.split('/')[-1]
+dataframe[['generated_text','duration']] = dataframe.apply(lambda x: get_transcription(source_path, x['filename'].split('/')[-1]), 
+                                                            axis=1, result_type="expand")
 
-#     transcription = __get_transcription(source_path + mp3_filename)
-#     print(transcription.json()['transcription'])
-
-
-
-dataframe['generated_text'] = dataframe['filename'].map(lambda x: get_transcription(source_path, x.split('/')[-1]))
-
+# could consider saving batches in future
 dataframe.to_csv('cv-valid-dev.csv', index=False)
