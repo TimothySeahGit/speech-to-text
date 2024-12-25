@@ -2,6 +2,7 @@ import zipfile
 import os
 import shutil
 import requests
+import pandas as pd
 
 archive = zipfile.ZipFile('common_voice.zip')
 
@@ -17,7 +18,13 @@ for file in archive.namelist():
     if file == 'cv-valid-dev.csv':
         archive.extract(file, '.')
 
-def __get_transcription(file_name):
+def __call_api(file_name):
+    """
+    Call the API.
+
+    Args:
+        file_name (str): The filename of the mp3 to be transcribed.
+    """
 
     headers = {
         'accept': 'application/json',
@@ -34,10 +41,42 @@ def __get_transcription(file_name):
     return response
 
 
+def get_transcription(source_path, filename):
+    """
+    Get the speech-to-text transcription for a file.
+
+    Args:
+        source_path (str): The location of the files.
+        file_name (str): The filename of the mp3 to be transcribed.
+    
+    Returns:
+        generated_text (str): The transcribed text.
+    """
+    if os.path.exists(source_path + filename):
+        response = __call_api(source_path + filename)
+        print(filename)
+        return response.json()['transcription'].lower()
+    else:
+        err = 'ERROR! File not found in source directory'
+        print(err)
+        return err
+
+
+
+
 all_files = os.listdir(source_path)
 print(all_files[:5])
 
-for mp3_filename in all_files[:5]:
+dataframe = pd.read_csv('cv-valid-dev.csv')
 
-    transcription = __get_transcription(source_path + mp3_filename)
-    print(transcription.json()['transcription'])
+# for filename in dataframe['filename']:
+#     mp3_filename = filename.split('/')[-1]
+
+#     transcription = __get_transcription(source_path + mp3_filename)
+#     print(transcription.json()['transcription'])
+
+
+
+dataframe['generated_text'] = dataframe['filename'].map(lambda x: get_transcription(source_path, x.split('/')[-1]))
+
+dataframe.to_csv('cv-valid-dev.csv', index=False)

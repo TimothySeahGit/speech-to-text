@@ -10,3 +10,6 @@ transformers
 # audio processing
 ffmpeg
 ffmpeg-python
+
+# data processing
+pandas
