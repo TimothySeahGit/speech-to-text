@@ -5,12 +5,14 @@ from fastapi import FastAPI, HTTPException, File, UploadFile
 
 import logging
 import sys
-sys.path.append('/c/ffmpeg/bin')
+# sys.path.append('C:\\ffmpeg\\bin')
 import os
 import ffmpeg
 
 logger = logging.getLogger('uvicorn.error')
 logger.setLevel(logging.DEBUG)
+# print(sys.path)
+# logger.debug(sys.path)
 
 app = FastAPI()
 
@@ -19,7 +21,7 @@ PORT: int  = 8001
 # # Use a pipeline as a high-level helper
 from transformers import pipeline
 
-pipe = pipeline("automatic-speech-recognition", model="./models")
+pipe = pipeline("automatic-speech-recognition", model="./wav2vec2")
 
 temp_filepath = 'input.mp3'
 
