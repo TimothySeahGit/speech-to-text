@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, File, UploadFile
 
 import logging
 import sys
+sys.path.append('/c/ffmpeg/bin')
 import os
 import ffmpeg
 
@@ -39,7 +40,7 @@ def ping():
 def create_file(file: Annotated[bytes, File()]):
     logger.debug(f'File size: {len(file)}')
     if len(file) > 10000000: # 10 Mb
-        raise HTTPException(status_code=404, detail="File Size too big, limit is 10Mb")
+        raise HTTPException(status_code=413, detail="File Size too big, limit is 10Mb")
 
     process = (
         ffmpeg
@@ -54,18 +55,36 @@ def create_file(file: Annotated[bytes, File()]):
 
     duration = ffmpeg.probe(temp_filepath)["format"]["duration"]
 
-    try: 
-        os.remove(temp_filepath) 
-        logger.debug(f"{temp_filepath} removed successfully") 
-    except OSError as error: 
-        logger.debug(error) 
-        logger.debug("File path can not be removed") 
 
-    
     # TODO: resample audio to 16000hz
- 
+    # process = (
+    #     ffmpeg
+    #     .input('pipe:0')
+    #     .output('pipe:', format='mp3', acodec='libmp3lame', ar='16000')
+    #     .run_async(pipe_stdin=True, pipe_stderr=True)
+    # )
+#     process = (
+#     ffmpeg
+#     .input(in_filename)
+#     .output('pipe':, format='rawvideo', pix_fmt='rgb24')
+#     .run_async(pipe_stdout=True, pipe_stderr=True)
+# )
 
-    return {"transcription": pipe(file), "duration": "{:.2f}".format(float(duration))}
+    out, _ = (ffmpeg
+        .input(temp_filepath)
+        .output('-', format='mp3', acodec='libmp3lame', ar='16000')
+        .overwrite_output()
+        .run(capture_stdout=True)
+    )
+    
+    os.remove(temp_filepath) 
+    logger.debug(f"{temp_filepath} removed successfully") 
+
+    # output_file = 'output.mp3'
+    # cmd_str = f"ffmpeg -i {temp_filepath} -c:a libmp3lame -ar 16000 {output_file} -y"
+    # os.system(cmd_str)
+    # logger.debug(out)
+    return {"transcription": pipe(out), "duration": "{:.2f}".format(float(duration))}
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile):
