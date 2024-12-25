@@ -1,0 +1,12 @@
+# api
+fastapi
+uvicorn
+python-multipart
+
+# inference
+torch
+transformers
+
+# audio processing
+ffmpeg
+ffmpeg-python
