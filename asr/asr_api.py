@@ -67,7 +67,7 @@ def create_file(file: Annotated[bytes, File()]):
     logger.debug(f"{temp_filepath} removed successfully") 
 
     # logger.debug(out)
-    return {"transcription": pipe(out), "duration": "{:.2f}".format(float(duration))}
+    return {"transcription": pipe(out)['text'], "duration": "{:.2f}".format(float(duration))}
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile):
