@@ -1,30 +1,57 @@
 services:
-  # asr:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8001:8001"
+  asr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      test:
+    ports:
+      - "8001:8001"
   # depends_on:
   #   elastic-backend:
   #     condition: service_healthy
   #     restart: true
   elastic-backend:
     image: elasticsearch:8.17.0
+    networks:
+      test:
     ports:
       - "9200:9200"
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms750m -Xmx750m
       - xpack.security.enabled=false
+      - "http.cors.allow-origin='*'"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,X-Elastic-Client-Meta"
+      - "http.cors.allow-credentials=true"
+      - "http.cors.allow-methods=GET,POST,OPTIONS,PUT,DELETE,PATCH"
     volumes:
       - ./data:/usr/data
       - ./elastic-backend:/usr/elastic-backend
     # command: bash -c "./bin/elasticsearch && /usr/elastic-backend/setup.sh"
     # command: ./bin/elasticsearch && /usr/elastic-backend/setup.sh
     # command: /usr/elastic-backend/setup.sh
+  search-ui:
+    image: elasticsearch:8.17.0
+    user: root
+    networks:
+      test:
+    ports:
+      - "3000:3000"
+      - "9205:9200"
+    environment:
+      - DEBIAN_FRONTEND="Noninteractive"
+    volumes:
+      - ./search-ui:/usr/search-ui
+    command: bash -c "/usr/search-ui/setup.sh"
 
 volumes:
   data:
     external: true
   elastic-backend:
+
+
+networks:
+  test:
+    driver: bridge

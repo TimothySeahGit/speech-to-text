@@ -1,3 +1,5 @@
+// modified from https://www.elastic.co/guide/en/search-ui/current/tutorials-elasticsearch.html
+
 import React from "react";
 
 // import AppSearchAPIConnector from "@elastic/search-ui-app-search-connector";
@@ -18,14 +20,14 @@ import {
 import { Layout } from "@elastic/react-search-ui-views";
 import "@elastic/react-search-ui-views/lib/styles/styles.css";
 
-import {
-    buildAutocompleteQueryConfig,
-    buildFacetConfigFromConfig,
-    buildSearchOptionsFromConfig,
-    buildSortOptionsFromConfig,
-    getConfig,
-    getFacetFields
-} from "./config/config-helper";
+// import {
+//     buildAutocompleteQueryConfig,
+//     buildFacetConfigFromConfig,
+//     buildSearchOptionsFromConfig,
+//     buildSortOptionsFromConfig,
+//     getConfig,
+//     getFacetFields
+// } from "./config/config-helper";
 
 // const { hostIdentifier, searchKey, endpointBase, engineName } = getConfig();
 // const connector = new AppSearchAPIConnector({
@@ -35,8 +37,9 @@ import {
 //     endpointBase
 // });
 const connector = new ElasticsearchAPIConnector({
-    host: "http://localhost:9200",
-    index: "cv-transcriptions"
+    host: "http://localhost:9200", // The browser can only see containers from the outside!
+    // host: "http://speech-to-text-elastic-backend-1:9200", # so, this is only for prod.
+    index: "cv-transcriptions-4"
 });
 
 // const config = {
@@ -130,7 +133,7 @@ const config = {
         results: {
             resultsPerPage: 5,
             search_fields: {
-                "generated_text.suggest": {
+                "generated_text": {
                     weight: 3
                 }
             },
@@ -154,7 +157,7 @@ const config = {
         }
     },
     apiConnector: connector,
-    alwaysSearchOnInitialLoad: true
+    alwaysSearchOnInitialLoad: false
 };
 
 export default function App() {
@@ -211,7 +214,7 @@ export default function App() {
                                                 urlField: "url",
                                                 shouldTrackClickThrough: true
                                             }}
-                                            autocompleteSuggestions={true}
+                                            autocompleteSuggestions={false}
                                             debounceLength={0}
                                         />
                                     }
