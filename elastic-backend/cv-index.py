@@ -1,7 +1,7 @@
 from elasticsearch import Elasticsearch, helpers
 import csv
 
-mappings = {
+mappings = {"dynamic": "true",
             "properties": {
                 "duration": {
                     "type": "float"
@@ -12,18 +12,6 @@ mappings = {
                 "down_votes": {
                     "type": "integer"
                 },
-                "generated_text": {
-                    "type": "text"
-                },
-                "age": {
-                    "type": "text"
-                },
-                "gender": {
-                    "type": "text"
-                },
-                "accent": {
-                    "type": "text"
-                }
             }
         }
 
