@@ -39,7 +39,7 @@ import "@elastic/react-search-ui-views/lib/styles/styles.css";
 const connector = new ElasticsearchAPIConnector({
     host: "http://localhost:9200", // The browser can only see containers from the outside!
     // host: "http://speech-to-text-elastic-backend-1:9200", # so, this is only for prod.
-    index: "cv-transcriptions-4"
+    index: "cv-transcriptions-float"
 });
 
 // const config = {
@@ -62,7 +62,7 @@ const config = {
             // actors: {},
             // directors: {}
             generated_text: {},
-            duration: {},
+            // duration: {},
             age: {},
             gender: {},
             accent: {}
@@ -113,17 +113,15 @@ const config = {
             //         { from: 8, to: 10, name: "Excellent" }
             //     ]
             // }
-            "duration": [
-                {
-                    "type": "range",
-                    "ranges": [
-                        { "to": 2, "name": "Less than 2 seconds" },
-                        { "from": 2, "to": 5, "name": "2 to 5 seconds" },
-                        { "from": 5, "to": 10, "name": "5 to 10 seconds" },
-                        { "from": 10, "name": "More than 10 seconds" }
-                    ]
-                }
-            ],
+            "duration": {
+                type: "range",
+                ranges: [
+                    { "to": 2, "name": "Less than 2 seconds" },
+                    { "from": 2.01, "to": 5, "name": "2 to 5 seconds" },
+                    { "from": 5.01, "to": 10, "name": "5 to 10 seconds" },
+                    { "from": 10.01, "name": "More than 10 seconds" }
+                ]
+            },
             "age.keyword": { type: "value" },
             "gender.keyword": { type: "value" },
             "accent.keyword": { type: "value" },
