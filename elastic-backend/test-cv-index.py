@@ -1,7 +1,8 @@
 from elasticsearch import Elasticsearch, helpers
 
 # Create the elasticsearch client.
-es = Elasticsearch("http://localhost:9200")
+# es = Elasticsearch("http://localhost:9200")
+es = Elasticsearch("http://elastic-backend-1:9200")
 
 index_name = 'cv-transcriptions-float'
 
