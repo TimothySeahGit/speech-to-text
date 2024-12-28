@@ -56,4 +56,13 @@ result = es.search(
   }
  )
 
-print(result['hits']['hits'])
+print(result['hits']['hits'], '\n')
+
+result = es.search(
+ index=index_name,
+  query={
+    'multi_match': {'query': "prognos", 'type': "bool_prefix", 'fields': ["generated_text.suggest^1"]}
+  }
+ )
+
+print(result['hits']['hits'], '\n')

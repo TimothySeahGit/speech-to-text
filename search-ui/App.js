@@ -47,9 +47,6 @@ const connector = new ElasticsearchAPIConnector({
 const config = {
     searchQuery: {
         search_fields: {
-            title: {
-                weight: 3
-            },
             generated_text: {},
             age: {},
             gender: {},
@@ -79,28 +76,36 @@ const config = {
         }
     },
     autocompleteQuery: {
-        results: {
-            resultsPerPage: 5,
-            search_fields: {
-                "generated_text": {
-                    weight: 3
-                }
-            },
-            result_fields: {
-                generated_text: {
-                    snippet: {
-                        size: 100,
-                        fallback: true
-                    }
-                },
-                filename: {
-                    raw: {}
-                }
-            }
-        },
+        // results: {
+        //     resultsPerPage: 5,
+        //     search_fields: {
+        //         "generated_text.suggest": {
+        //             weight: 3
+        //         }
+        //     },
+        //     result_fields: {
+        //         "generated_text": {
+        //             snippet: {
+        //                 size: 100,
+        //                 fallback: true
+        //             }
+        //         }
+        //     }
+        // },
         suggestions: {
             types: {
-                results: { fields: ["generated_text"] }
+                popularQueries: {
+                    search_fields: {
+                        "generated_text.suggest": {} // fields used to query
+                    },
+                    result_fields: {
+                        "generated_text": { // fields used for display
+                            raw: {}
+                        }
+                    },
+                    index: "cv-transcriptions-float",
+                    queryType: "results"
+                }
             },
             size: 4
         }
@@ -120,15 +125,21 @@ export default function App() {
                                 <Layout
                                     header={
                                         <SearchBox
-                                            autocompleteMinimumCharacters={3}
-                                            autocompleteResults={{
-                                                linkTarget: "_blank",
-                                                sectionTitle: "Results",
-                                                titleField: "title",
-                                                urlField: "url",
-                                                shouldTrackClickThrough: true
+                                            // autocompleteMinimumCharacters={3}
+                                            // autocompleteResults={{
+                                            //     linkTarget: "_blank",
+                                            //     sectionTitle: "Results",
+                                            //     titleField: "generated_text",
+                                            //     // urlField: "url",
+                                            //     shouldTrackClickThrough: true
+                                            // }}
+                                            // autocompleteSuggestions={false}
+                                            autocompleteSuggestions={{
+                                                popularQueries: {
+                                                    queryType: "results",
+                                                    displayField: "generated_text" // specify which field used to display the suggestion
+                                                }
                                             }}
-                                            autocompleteSuggestions={false}
                                             debounceLength={0}
                                         />
                                     }

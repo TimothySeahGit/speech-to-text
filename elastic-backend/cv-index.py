@@ -12,6 +12,14 @@ mappings = {"dynamic": "true",
                 "down_votes": {
                     "type": "integer"
                 },
+                "generated_text": {
+                    "type": "text",
+                    "fields": {
+                        "suggest": {
+                            "type": "search_as_you_type"
+                        }
+                    }
+                }
             }
         }
 
