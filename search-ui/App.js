@@ -28,10 +28,11 @@ import "@elastic/react-search-ui-views/lib/styles/styles.css";
 //     getConfig,
 //     getFacetFields
 // } from "./config/config-helper";
+const ec2_config = require('./app_config.json')
 
 const connector = new ElasticsearchAPIConnector({
-    host: "http://localhost:9200", // The browser can only see containers from the outside!
-    // host: "http://speech-to-text-elastic-backend-1:9200", # so, this is only for prod.
+    // host: "http://localhost:9200", // The browser can only see containers from the outside!
+    host: `http://${ec2_config.public_ip}:9200`, // so, this is only for prod.
     index: "cv-transcriptions-float"
 });
 
