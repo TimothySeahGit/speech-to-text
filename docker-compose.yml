@@ -1,50 +1,85 @@
 services:
-  asr:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    networks:
-      test:
-    ports:
-      - "8001:8001"
-  # depends_on:
-  #   elastic-backend:
-  #     condition: service_healthy
-  #     restart: true
-  elastic-backend:
+  # asr:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   networks:
+  #     speech-to-text:
+  #   ports:
+  #     - "8001:8001"
+  elastic-backend-1:
     image: elasticsearch:8.17.0
+    container_name: elastic-backend-1
     networks:
-      test:
+      speech-to-text:
     ports:
       - "9200:9200"
     environment:
-      - discovery.type=single-node
+      # - discovery.type=single-node
+      - cluster.name=elastic-cluster
+      - node.name=elastic-backend-1
+      - discovery.seed_hosts=elastic-backend-2
+      - cluster.initial_master_nodes=elastic-backend-1,elastic-backend-2
       - ES_JAVA_OPTS=-Xms750m -Xmx750m
       - xpack.security.enabled=false
       - "http.cors.allow-origin='*'"
       - "http.cors.enabled=true"
       - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,X-Elastic-Client-Meta"
       - "http.cors.allow-credentials=true"
-      - "http.cors.allow-methods=GET,POST,OPTIONS,PUT,DELETE,PATCH"
-    volumes:
-      - ./data:/usr/data
-      - ./elastic-backend:/usr/elastic-backend
-    # command: bash -c "./bin/elasticsearch && /usr/elastic-backend/setup.sh"
-    # command: ./bin/elasticsearch && /usr/elastic-backend/setup.sh
-    # command: /usr/elastic-backend/setup.sh
+      - "http.cors.allow-methods=GET,OPTIONS,PUT,DELETE,PATCH"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test: curl -s http://elastic-backend-1:9200 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  elastic-backend-2:
+    image: elasticsearch:8.17.0
+    container_name: elastic-backend-2
+    networks:
+      speech-to-text:
+    environment:
+      # - discovery.type=single-node
+      - cluster.name=elastic-cluster
+      - node.name=elastic-backend-2
+      - discovery.seed_hosts=elastic-backend-1
+      - cluster.initial_master_nodes=elastic-backend-2,elastic-backend-1
+      - ES_JAVA_OPTS=-Xms750m -Xmx750m
+      - xpack.security.enabled=false
+      - "http.cors.allow-origin='*'"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,X-Elastic-Client-Meta"
+      - "http.cors.allow-credentials=true"
+      - "http.cors.allow-methods=OPTIONS,HEAD,GET,POST,PUT,DELETE,PATCH"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
   search-ui:
     image: elasticsearch:8.17.0
-    user: root
+    container_name: search-ui
     networks:
-      test:
+      speech-to-text:
     ports:
       - "3000:3000"
       - "9205:9200"
+    user: root
     environment:
       - DEBIAN_FRONTEND="Noninteractive"
     volumes:
+      - ./data:/usr/data
+      - ./elastic-backend:/usr/elastic-backend
       - ./search-ui:/usr/search-ui
-    command: bash -c "/usr/search-ui/setup.sh"
+    command: bash -c "/usr/elastic-backend/setup.sh && /usr/search-ui/setup.sh"
+    depends_on:
+      elastic-backend-1:
+        condition: service_healthy
+        restart: true
 
 volumes:
   data:
@@ -53,5 +88,5 @@ volumes:
 
 
 networks:
-  test:
+  speech-to-text:
     driver: bridge
