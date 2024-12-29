@@ -20,7 +20,7 @@ services:
       - node.name=elastic-backend-1
       - discovery.seed_hosts=elastic-backend-2
       - cluster.initial_master_nodes=elastic-backend-1,elastic-backend-2
-      - ES_JAVA_OPTS=-Xms750m -Xmx750m
+      - ES_JAVA_OPTS=-Xms100m -Xmx100m
       - xpack.security.enabled=false
       - "http.cors.allow-origin='*'"
       - "http.cors.enabled=true"
@@ -48,7 +48,7 @@ services:
       - node.name=elastic-backend-2
       - discovery.seed_hosts=elastic-backend-1
       - cluster.initial_master_nodes=elastic-backend-2,elastic-backend-1
-      - ES_JAVA_OPTS=-Xms750m -Xmx750m
+      - ES_JAVA_OPTS=-Xms100m -Xmx100m
       - xpack.security.enabled=false
       - "http.cors.allow-origin='*'"
       - "http.cors.enabled=true"
