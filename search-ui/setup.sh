@@ -1,3 +1,5 @@
+#!/bin/sh
+
 curl https://codeload.github.com/elastic/app-search-reference-ui-react/tar.gz/master | tar -xz
 ls -la
 
@@ -22,5 +24,6 @@ yarn
 
 # copy App.js into app-search-reference-ui-react/src/
 cp /usr/search-ui/App.js ./src/
+cp /usr/search-ui/app_config.json ./src/
 
 yarn start
