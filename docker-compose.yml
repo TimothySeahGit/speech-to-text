@@ -72,10 +72,10 @@ services:
     environment:
       - DEBIAN_FRONTEND="Noninteractive"
     volumes:
-      - ./data:/usr/data
-      - ./elastic-backend:/usr/elastic-backend
-      - ./search-ui:/usr/search-ui
-    command: bash -c "/usr/elastic-backend/setup.sh && /usr/search-ui/setup.sh"
+      - ./data:/home/ec2-user/data
+      - ./elastic-backend:/home/ec2-user/elastic-backend
+      - ./search-ui:/home/ec2-user/search-ui
+    command: bash -c "/home/ec2-user/elastic-backend/setup.sh && /home/ec2-user/search-ui/setup.sh"
     depends_on:
       elastic-backend-1:
         condition: service_healthy
