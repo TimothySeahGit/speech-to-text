@@ -1,3 +1,5 @@
+#!/bin/sh
+
 curl https://codeload.github.com/elastic/app-search-reference-ui-react/tar.gz/master | tar -xz
 ls -la
 
