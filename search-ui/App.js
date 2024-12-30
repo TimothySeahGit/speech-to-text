@@ -20,31 +20,16 @@ import {
 import { Layout } from "@elastic/react-search-ui-views";
 import "@elastic/react-search-ui-views/lib/styles/styles.css";
 
-// import {
-//     buildAutocompleteQueryConfig,
-//     buildFacetConfigFromConfig,
-//     buildSearchOptionsFromConfig,
-//     buildSortOptionsFromConfig,
-//     getConfig,
-//     getFacetFields
-// } from "./config/config-helper";
-const ec2_config = require('./app_config.json')
+// In future, get the ec2 instance address automatically instead of uploading the configs
+// const ec2_config = require('./app_config.json')
 
 const connector = new ElasticsearchAPIConnector({
-    // host: "http://localhost:9200", // The browser can only see containers from the outside!
-    host: `http://${ec2_config.public_ip}:9200`, // so, this is only for prod.
+    // host: "http://localhost:9200", // for testing locally
+    host: "http://ec2-3-82-42-191.compute-1.amazonaws.com:9200", // The browser can only see containers from the outside!
+    // host: `http://${ec2_config.public_ip}:9200`,
     index: "cv-transcriptions-float"
 });
 
-// const config = {
-//     searchQuery: {
-//         facets: buildFacetConfigFromConfig(),
-//         ...buildSearchOptionsFromConfig()
-//     },
-//     autocompleteQuery: buildAutocompleteQueryConfig(),
-//     apiConnector: connector,
-//     alwaysSearchOnInitialLoad: true
-// };
 const config = {
     searchQuery: {
         search_fields: {
@@ -77,22 +62,6 @@ const config = {
         }
     },
     autocompleteQuery: {
-        // results: {
-        //     resultsPerPage: 5,
-        //     search_fields: {
-        //         "generated_text.suggest": {
-        //             weight: 3
-        //         }
-        //     },
-        //     result_fields: {
-        //         "generated_text": {
-        //             snippet: {
-        //                 size: 100,
-        //                 fallback: true
-        //             }
-        //         }
-        //     }
-        // },
         suggestions: {
             types: {
                 popularQueries: {
@@ -126,15 +95,6 @@ export default function App() {
                                 <Layout
                                     header={
                                         <SearchBox
-                                            // autocompleteMinimumCharacters={3}
-                                            // autocompleteResults={{
-                                            //     linkTarget: "_blank",
-                                            //     sectionTitle: "Results",
-                                            //     titleField: "generated_text",
-                                            //     // urlField: "url",
-                                            //     shouldTrackClickThrough: true
-                                            // }}
-                                            // autocompleteSuggestions={false}
                                             autocompleteSuggestions={{
                                                 popularQueries: {
                                                     queryType: "results",
