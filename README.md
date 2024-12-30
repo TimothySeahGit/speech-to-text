@@ -8,6 +8,7 @@ docker build -t stt-asr:v1 .
 
 docker run -p 8001:8001 stt-asr:v1
 ```
+Download common_voice.zip to the project root folder.
 Run the script to process the data:
 ```
 pip install pandas
@@ -17,7 +18,7 @@ python asr/cv-decode.py
   
 ### Part 7: Accessing the hosted search app
 ```
-http://<redacted>.compute-1.amazonaws.com:3000/
+http://ec2-3-82-42-191.compute-1.amazonaws.com:3000/
 ```
 You can search in the free text field on age, gender, accent, and generated_text. Autocomplete suggestions will be made based on generated_text.
 

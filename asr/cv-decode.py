@@ -9,6 +9,9 @@ archive = zipfile.ZipFile('common_voice.zip')
 source_path = 'cv-valid-dev/cv-valid-dev/'
 if os.path.exists(source_path) and os.path.isdir(source_path):
     shutil.rmtree(source_path)
+target_path = 'data/'
+if not os.path.exists(target_path):
+   os.makedirs(target_path)
 
 
 # extract from zip file
@@ -69,4 +72,4 @@ dataframe[['generated_text','duration']] = dataframe.apply(lambda x: get_transcr
                                                             axis=1, result_type="expand")
 
 # could consider saving batches in future
-dataframe.to_csv('cv-valid-dev.csv', index=False)
+dataframe.to_csv(f'./{target_path}cv-valid-dev.csv', index=False)
