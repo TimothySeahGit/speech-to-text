@@ -26,7 +26,7 @@ services:
       - "http.cors.enabled=true"
       - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,X-Elastic-Client-Meta"
       - "http.cors.allow-credentials=true"
-      - "http.cors.allow-methods=GET,OPTIONS,PUT,DELETE,PATCH"
+      - "http.cors.allow-methods=OPTIONS,HEAD,GET,POST,PUT,DELETE,PATCH"
     ulimits:
       memlock:
         soft: -1
@@ -84,8 +84,6 @@ services:
 volumes:
   data:
     external: true
-  elastic-backend:
-
 
 networks:
   speech-to-text:
